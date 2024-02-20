@@ -1,7 +1,11 @@
 # finaly a simple dashboard
 
 NO SERVERS
+
 NO HOSTING
+
 ONLY LOCALHOST STORAGE
+
 SIMPLICITY
+
 AI GENERATED
