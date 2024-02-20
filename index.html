@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service Widgets</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding-top: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .widget-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .widget-name {
+            font-size: 18px;
+            /* Adjust the font size for the widget name */
+            font-weight: bold;
+            /* Make the widget name bold */
+            margin-bottom: 5px;
+            /* Add some spacing between name and url */
+        }
+
+        .widget-url {
+            font-size: 12px;
+            /* Adjust the font size for the widget url */
+            color: #666;
+            /* Adjust the color of the url to make it less prominent */
+        }
+
+        .widget {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 15px;
+            padding: 20px;
+            width: 200px;
+            text-align: center;
+            cursor: pointer;
+            /* Change cursor to pointer */
+        }
+
+        .widget:hover {
+            /* Add hover effect if desired */
+            transform: scale(1.05);
+        }
+
+
+        .widget i {
+            font-size: 36px;
+            /* Adjust the font size for the icons */
+            margin-bottom: 10px;
+            /* Add some spacing between icon and name */
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Service Widgets</h1>
+
+    <!-- Container for widgets -->
+    <div class="container widget-container" id="widgetContainer"></div>
+
+    <!-- Add Widget Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h4>Add Widget</h4>
+            <div class="input-field">
+                <input type="text" id="widgetName" required />
+                <label for="widgetName">Name</label>
+            </div>
+            <div class="input-field">
+                <input type="url" id="widgetUrl" required />
+                <label for="widgetUrl">URL</label>
+            </div>
+            <div class="input-field">
+                <input type="text" id="widgetIcon" class="icon-picker" required />
+                <label for="widgetIcon">Icon</label>
+            </div>
+            <p>For icons, you can visit <a href="https://fonts.google.com/icons" target="_blank">Google Fonts Icons</a>
+            </p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>
+            <button id="addBtn" class="waves-effect waves-light btn">Add</button>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fixed-action-btn">
+        <a href="#addModal" class="btn-floating btn-large waves-effect waves-light modal-trigger"><i
+                class="material-icons">add</i></a>
+        <a href="#importExportModal" class="btn-floating btn-large waves-effect waves-light modal-trigger"><i
+                class="material-icons">import_export</i></a>
+    </div>
+
+    <!-- Import/Export Modal -->
+    <div id="importExportModal" class="modal">
+        <div class="modal-content">
+            <h4>Import/Export Widgets</h4>
+            <p>Here you can import/export your widget configuration.</p>
+            <p>To export, simply copy the configuration below.</p>
+            <textarea id="widgetConfig" class="materialize-textarea"></textarea>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+            <button id="importBtn" class="waves-effect waves-light btn">Import</button>
+            <button id="exportBtn" class="waves-effect waves-light btn">Export to clipboard</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        // Initialize Materialize components
+        $(document).ready(function () {
+            $('.modal').modal();
+        });
+
+        // Function to render widgets from localStorage
+        function renderWidgets() {
+            var data = JSON.parse(localStorage.getItem('widgets'))
+            document.querySelector('title').innerHTML = data.titleContent;
+            document.querySelector('h1').innerHTML = data.titleContent;
+            document.body.style.backgroundColor = data.backgroundColor;
+            document.getElementById('widgetConfig').value = localStorage.getItem('widgets'); // for export no parsing
+
+            const widgetContainer = document.getElementById('widgetContainer');
+            widgetContainer.innerHTML = '';
+
+            const widgets = data.widgets || [];
+
+            widgets.forEach(widget => {
+                const widgetElement = document.createElement('div');
+                widgetElement.classList.add('widget');
+                widgetElement.style.backgroundColor = widget.color;
+
+                const icon = document.createElement('i');
+                icon.classList.add('material-icons');
+                icon.textContent = widget.icon;
+                widgetElement.appendChild(icon);
+
+                const name = document.createElement('div');
+                name.classList.add('widget-name'); // Add a class for styling
+                name.textContent = widget.name;
+                widgetElement.appendChild(name);
+
+                const url = document.createElement('div');
+                url.classList.add('widget-url'); // Add a class for styling
+                url.textContent = widget.url;
+                widgetElement.appendChild(url);
+
+                // Add click event listener to open URL in new tab
+                widgetElement.addEventListener('click', function () {
+                    window.open(widget.url, '_blank');
+                });
+
+                widgetContainer.appendChild(widgetElement);
+            });
+
+        }
+
+        // Function to handle export button click
+        document.getElementById('exportBtn').addEventListener('click', function () {
+            navigator.clipboard.writeText(localStorage.getItem('widgets')).then(function () {
+                M.toast({ html: 'Widget configuration copied to clipboard' });
+            }, function (err) {
+                console.error('Unable to copy widget configuration to clipboard', err);
+            });
+        });
+
+        // Function to handle import button click
+        document.getElementById('importBtn').addEventListener('click', function () {
+            const importData = JSON.parse(document.getElementById('widgetConfig').value);
+            localStorage.setItem('widgets', JSON.stringify(importData));
+            M.toast({ html: 'Widget configuration imported' });
+            renderWidgets();
+            $('#importExportModal').modal('close');
+        });
+
+        // Function to handle add button click
+        document.getElementById('addBtn').addEventListener('click', function () {
+            const name = document.getElementById('widgetName').value;
+            const url = document.getElementById('widgetUrl').value;
+            const icon = document.getElementById('widgetIcon').value;
+
+            const widget = { name, url, icon, color: getRandomColor() };
+
+            const widgets = JSON.parse(localStorage.getItem('widgets'));
+            widgets.widgets.push(widget);
+            localStorage.setItem('widgets', JSON.stringify(widgets));
+
+            renderWidgets();
+            $('#addModal').modal('close');
+        });
+
+        // Generate random background color
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Render widgets on page load
+        renderWidgets();
+    </script>
+</body>
+
+</html>

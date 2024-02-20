@@ -1,0 +1,24 @@
+{
+    "titleContent": "Wow Widgets",
+    "backgroundColor": "#DEDEDE",
+    "widgets": [
+        {
+            "name": "Google",
+            "url": "http://www.google.com",
+            "icon": "cloud",
+            "color": "#f47373"
+        },
+        {
+            "name": "Cat",
+            "url": "https://nyan.cat",
+            "icon": "pets",
+            "color": "#047373"
+        },
+        {
+            "name": "VSphere",
+            "url": "https://duckduckgo.com",
+            "icon": "done",
+            "color": "#C423DC"
+        }
+    ]
+}
